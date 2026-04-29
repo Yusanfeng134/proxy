@@ -1,0 +1,24 @@
+services:
+  gost:
+    image: ${GOST_IMAGE:-gogost/gost:latest}
+    container_name: residential-relay-gost
+    restart: unless-stopped
+    command: ["-C", "/etc/gost/gost.yml"]
+    ports:
+      - "${SOCKS_PORT:-1080}:${SOCKS_PORT:-1080}/tcp"
+      - "${HTTP_PORT:-8080}:${HTTP_PORT:-8080}/tcp"
+      - "${TUNNEL_PORT:-8443}:${TUNNEL_PORT:-8443}/tcp"
+    volumes:
+      - ./.runtime/gost.yml:/etc/gost/gost.yml:ro
+      - ./certs/server.crt:/etc/gost/certs/server.crt:ro
+      - ./certs/server.key:/etc/gost/certs/server.key:ro
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

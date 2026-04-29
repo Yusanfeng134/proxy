@@ -1,0 +1,19 @@
+.DS_Store
+
+# Local credentials and generated runtime files.
+.env
+.env.*
+!.env.example
+.runtime/
+
+# Generated TLS material. Copy ca.crt to clients manually after generation.
+certs/*
+!certs/.gitkeep
+*.srl
+
+# Local worktrees, dependency directories, and editor state.
+.worktrees/
+worktrees/
+node_modules/
+.vscode/
+.idea/
