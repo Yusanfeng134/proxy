@@ -21,7 +21,7 @@
    nano .env
    ```
 
-4. 修改 `.env` 里的公开访问账号、两个上游 SOCKS5 账号和 `SERVER_HOST`。
+4. 修改 `.env` 里的公开访问账号、两个上游账号和 `SERVER_HOST`。如果上游是 HTTP/HTTPS 代理，把对应的 `UPSTREAM_1_TYPE` 或 `UPSTREAM_2_TYPE` 改成 `http`；默认是 `socks5`。
 5. 生成配置、证书并启动：
 
    ```bash

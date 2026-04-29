@@ -14,6 +14,9 @@ echo "Rendering configs from .env.example..."
   --output "$VALIDATE_DIR/gost.yml" \
   --client-output "$VALIDATE_DIR/client-h2.yml" >/dev/null
 
+echo "Running config rendering tests..."
+./tests/render-config-upstream-type.sh >/dev/null
+
 echo "Generating disposable validation certificates..."
 CERT_DIR="$CERT_DIR" TLS_SERVER_NAME=proxy.local ./scripts/generate-certs.sh --force --quiet
 

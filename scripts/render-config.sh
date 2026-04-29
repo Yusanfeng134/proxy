@@ -57,6 +57,8 @@ TUNNEL_PORT=${TUNNEL_PORT:-8443}
 LOCAL_SOCKS_PORT=${LOCAL_SOCKS_PORT:-11080}
 UPSTREAM_MAX_FAILS=${UPSTREAM_MAX_FAILS:-2}
 UPSTREAM_FAIL_TIMEOUT=${UPSTREAM_FAIL_TIMEOUT:-30s}
+UPSTREAM_1_TYPE=${UPSTREAM_1_TYPE:-socks5}
+UPSTREAM_2_TYPE=${UPSTREAM_2_TYPE:-socks5}
 TLS_SERVER_NAME=${TLS_SERVER_NAME:-proxy.local}
 SERVER_HOST=${SERVER_HOST:-127.0.0.1}
 CLIENT_CA_FILE=${CLIENT_CA_FILE:-./ca.crt}
@@ -78,7 +80,7 @@ fi
 
 newline='
 '
-string_vars='PUBLIC_USER PUBLIC_PASS UPSTREAM_1_HOST UPSTREAM_1_USER UPSTREAM_1_PASS UPSTREAM_2_HOST UPSTREAM_2_USER UPSTREAM_2_PASS TLS_SERVER_NAME SERVER_HOST CLIENT_CA_FILE GOST_LOG_LEVEL'
+string_vars='PUBLIC_USER PUBLIC_PASS UPSTREAM_1_HOST UPSTREAM_1_TYPE UPSTREAM_1_USER UPSTREAM_1_PASS UPSTREAM_2_HOST UPSTREAM_2_TYPE UPSTREAM_2_USER UPSTREAM_2_PASS TLS_SERVER_NAME SERVER_HOST CLIENT_CA_FILE GOST_LOG_LEVEL'
 for var in $string_vars; do
   eval "value=\${$var:-}"
   case "$value" in
@@ -123,6 +125,18 @@ for host_var in UPSTREAM_1_HOST UPSTREAM_2_HOST; do
   case "$host_value" in
     *://*)
       echo "$host_var should be only a hostname or IP, not a URL." >&2
+      exit 1
+      ;;
+  esac
+done
+
+for type_var in UPSTREAM_1_TYPE UPSTREAM_2_TYPE; do
+  eval "type_value=\${$type_var}"
+  case "$type_value" in
+    socks5|http)
+      ;;
+    *)
+      echo "$type_var must be either socks5 or http." >&2
       exit 1
       ;;
   esac
@@ -186,7 +200,7 @@ chains:
           - name: residential-a
             addr: $(yaml_quote "$UPSTREAM_1_HOST:$UPSTREAM_1_PORT")
             connector:
-              type: socks5
+              type: $UPSTREAM_1_TYPE
               auth:
                 username: $(yaml_quote "$UPSTREAM_1_USER")
                 password: $(yaml_quote "$UPSTREAM_1_PASS")
@@ -195,7 +209,7 @@ chains:
           - name: residential-b
             addr: $(yaml_quote "$UPSTREAM_2_HOST:$UPSTREAM_2_PORT")
             connector:
-              type: socks5
+              type: $UPSTREAM_2_TYPE
               auth:
                 username: $(yaml_quote "$UPSTREAM_2_USER")
                 password: $(yaml_quote "$UPSTREAM_2_PASS")
